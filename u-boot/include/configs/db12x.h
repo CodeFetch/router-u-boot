@@ -79,6 +79,14 @@
 						GPIO20 | GPIO21
 	#define CONFIG_QCA_GPIO_MASK_IN		GPIO16
 
+#elif defined(CONFIG_FOR_TPLINK_WR842N_V2)
+
+	#define CONFIG_QCA_GPIO_MASK_LED_ACT_L	GPIO11 | GPIO12 | GPIO13 |\
+						GPIO14 | GPIO15 | GPIO18 |\
+						GPIO19 | GPIO20 | GPIO21
+	#define CONFIG_QCA_GPIO_MASK_IN		GPIO16
+	#define CONFIG_QCA_GPIO_MASK_OUT_INIT_H	GPIO4
+
 #elif defined(CONFIG_FOR_YUNCORE_CPE870)
 
 	#define CONFIG_QCA_GPIO_MASK_LED_ACT_L	GPIO0 | GPIO1  | GPIO2  |\
@@ -327,6 +335,7 @@
       defined(CONFIG_FOR_TPLINK_WDR43X0_V1) ||\
       defined(CONFIG_FOR_TPLINK_WR1041N_V2) ||\
       defined(CONFIG_FOR_TPLINK_WR841N_V8)  ||\
+      defined(CONFIG_FOR_TPLINK_WR842N_V2)  ||\
       defined(CONFIG_FOR_YUNCORE_CPE870)
 
 	#define CONFIG_QCA_PLL_IN_FLASH_BLOCK_OFFSET	0x10000
@@ -351,6 +360,33 @@
 #if defined(CONFIG_FOR_YUNCORE_CPE870)
 
 	#define CONFIG_UPG_SCRIPTS_FW_ADDR_HEX	0x9F020000
+
+#endif
+
+
+/*
+ * =======================================
+ * For TFTP upgrade using the reset button
+ * =======================================
+ */
+
+/* TFTP client/server IP addresses */
+#if defined(CONFIG_FOR_TPLINK_WR841N_V8) ||\
+    defined(CONFIG_FOR_TPLINK_WR842N_V2)
+
+	#define CONFIG_TFTPIPADDR		192.168.0.86
+	#define CONFIG_TFTPSERVERIP		192.168.0.66
+
+#endif
+
+/* TFTP firmware filenames */
+#if defined(CONFIG_FOR_TPLINK_WR841N_V8)
+
+	#define CONFIG_CUSTOM_BOOTFILE	mr3420v2_tp_recovery.bin
+
+#elif defined(CONFIG_FOR_TPLINK_WR842N_V2)
+
+	#define CONFIG_CUSTOM_BOOTFILE	wr842nv2_tp_recovery.bin
 
 #endif
 
