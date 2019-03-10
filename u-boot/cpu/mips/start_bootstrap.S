@@ -1,6 +1,7 @@
 /*
  * Startup Code for MIPS32 CPU-core
  *
+ * Copyright (C) 2018 Vincent Wiemann <vincent.wiemann@ironai.com>
  * Copyright (C) 2015 Piotr Dymacz <piotr@dymacz.pl>
  * Copyright (C) 2013 Qualcomm Atheros, Inc.
  * Copyright (C) 2003 Wolfgang Denk, DENX Software Engineering, <wd@denx.de>
@@ -239,11 +240,17 @@ reset:
 	lw    t1, 0(ra)
 	move  gp, t1
 
+/* TODO Does it work on ar71xx/ar724x/ar91xx, too? */
+#if !(SOC_TYPE & QCA_AR71XX_SOC) && \
+	!(SOC_TYPE & QCA_AR724X_SOC) && \
+	!(SOC_TYPE & QCA_AR91XX_SOC)
 	/* Lowlevel initialization of GPIO */
 	la   t7, lowlevel_gpio_init
 	jalr t7
 	nop
+#endif
 
+#if !(SOC_TYPE & QCA_AR91XX_SOC)
 	/* Initialize any external memory */
 	la   t9, lowlevel_init
 	jalr t9
@@ -252,8 +259,30 @@ reset:
 	la t0, rel_start
 	j  t0
 	nop
+#endif
 
 rel_start:
+#if (SOC_TYPE & QCA_AR71XX_SOC) || \
+	(SOC_TYPE & QCA_AR724X_SOC)
+	/* REMAP_DISABLE */
+	li	a0, 0xbf000004 /* AR7100_SPI_CLOCK */
+	li	t0, 0x43
+	sw	t0, 0(a0)
+#endif
+
+#if (SOC_TYPE & QCA_AR91XX_SOC) && defined(CFG_HOWL_1_2)
+	/* Disable remap for parallel flash */
+	li  t7, AR9100_FLASH_CONFIG;
+	lw  t8, 0(t7);
+	li  t9, 0xffbf0000;
+	and t8, t8, t9;
+	li  t9, 0x22fc;
+	or  t8, t8, t9;
+	li  t9, 0xffcfffff; /* scale = 0 */
+	and t8, t8, t9;
+	sw  t8, 0(t7);
+#endif
+
 	/* Initialize caches... */
 	la   t9, simple_mips_cache_reset
 	jalr t9
@@ -277,7 +306,18 @@ rel_start:
 2:
 	mtc0 t0, CP0_CONFIG
 
-#if (SOC_TYPE & QCA_AR933X_SOC) || \
+#if (SOC_TYPE & QCA_AR91XX_SOC)
+	/* Set up temporary stack.
+	 */
+	li	a0, CFG_INIT_SP_OFFSET /* TODO: CONFIG_INIT_SRAM_SP_OFFSET */
+	la      t9, mips_cache_lock
+	jalr    t9
+	nop
+#endif
+
+#if (SOC_TYPE & QCA_AR71XX_SOC) || \
+	(SOC_TYPE & QCA_AR724X_SOC) || \
+	(SOC_TYPE & QCA_AR933X_SOC) || \
 	(SOC_TYPE & QCA_AR934X_SOC)
 	la   t9, mips_cache_lock_24k
 	jalr t9
