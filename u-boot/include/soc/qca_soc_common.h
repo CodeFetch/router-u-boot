@@ -2065,6 +2065,11 @@ u32  qca_xtal_is_40mhz(void);
 #define qca_soc_reg_write(_addr, _val)	\
 		((*(volatile unsigned int *)KSEG1ADDR(_addr)) = (_val))
 
+#define qca_soc_reg_write_read(_addr, _val) do {       \
+                    qca_soc_reg_write(_addr, _val);    \
+                    qca_soc_reg_read(_addr);           \
+} while(0);
+
 #define qca_soc_reg_read_set(_addr, _mask)	\
 		qca_soc_reg_write((_addr), (qca_soc_reg_read((_addr)) | (_mask)))
 
