@@ -306,6 +306,15 @@ int NetLoop(proto_t protocol){
 	if(eth_is_on_demand_init() || protocol != NETCONS){
 		eth_halt();
 #ifdef CONFIG_NET_MULTI
+	#if defined (CONFIG_AG7240_SPEPHY)
+	       /* ag7240 uses eth1 as LAN and eth0 as WAN in U-Boot
+		* because GE0 is MIDO server which must initialize first
+		*/
+		setenv("ethact", "eth1");
+	#else
+		setenv("ethact", "eth0");
+	#endif
+
 		eth_set_current();
 #endif
 		if(!eth_init(bd)){
