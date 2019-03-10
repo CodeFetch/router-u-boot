@@ -208,6 +208,10 @@ endef
 # TARGETS IN ALPHABETICAL ORDER, SHARED FIRST
 # ===========================================
 
+COMMON_AR724X_TARGETS = \
+	tp-link_tl-wr841n_v7 \
+	tp-link_tl-mr3420_v2
+
 COMMON_AR933X_TARGETS = \
 	gainstrong_oolite_v1_dev \
 	gl-inet_6416 \
@@ -224,6 +228,7 @@ COMMON_AR933X_TARGETS = \
 	tp-link_tl-wr720n_v3_CN \
 	tp-link_tl-wr740n_v4
 
+$(COMMON_AR724X_TARGETS) \
 $(COMMON_AR933X_TARGETS):
 	@$(call build,123,1)
 
