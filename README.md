@@ -1,6 +1,15 @@
 U-Boot 1.1.4 modification for routers
 ==========
 
+Wichtiger Hinweis zum c't-Artikel
+---------------------------------
+In den Artikel hat sich ein Fehler eingeschlichen.
+
+Der korrekte Befehl zum Schreiben der MAC-Adresse lautet:
+`printf "\xaa\xbb\xcc\xdd\xee\xff" | dd conv=notrunc ibs=1 obs=256 seek=508 count=6 of=out.bin`
+
+Ich bitte vielmals um Verzeihung.
+
 Ready snapshot/test images
 --------------------------
 Starting from 24.09.2016, ready images, built on **Raspberry Pi 3** with **LEDE** toolchain, are available **[on my server](http://projects.dymacz.pl)**.
