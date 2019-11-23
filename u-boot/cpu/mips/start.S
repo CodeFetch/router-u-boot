@@ -360,8 +360,6 @@ rel_start:
 	nop
 #endif
 
-#endif /* #ifndef CONFIG_SKIP_LOWLEVEL_INIT */
-
 #endif /* #ifndef COMPRESSED_UBOOT */
 
 #if (SOC_TYPE & QCA_AR934X_SOC) | \
