@@ -210,7 +210,7 @@ endef
 
 COMMON_AR724X_TARGETS = \
 	tp-link_tl-wr841n_v7 \
-	tp-link_tl-mr3420_v2
+	tp-link_tl-mr3420_v1
 
 COMMON_AR933X_TARGETS = \
 	gainstrong_oolite_v1_dev \
