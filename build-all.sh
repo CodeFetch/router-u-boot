@@ -10,6 +10,7 @@ rm bin/*.log
 
 for device in $ALL_64 $ALL
 do
+	echo $device
 	make $* clean
 	make $* $device > bin/$device.log 2>&1
 done
