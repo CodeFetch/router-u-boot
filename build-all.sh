@@ -4,9 +4,12 @@ ALL="8devices_carambola2 alfa-network_ap121f alfa-network_hornet-ub alfa-network
 
 ALL_64="comfast_cf-e314n comfast_cf-e320n_v2 comfast_cf-e520n comfast_cf-e530n d-link_dir-505_a1 yuncore_cpe870"
 
+mkdir -p bin
+rm bin/*.log
+
+
 for device in $ALL_64 $ALL
 do
-	mkdir -p bin
 	make $* clean
 	make $* $device > bin/$device.log 2>&1
 done
