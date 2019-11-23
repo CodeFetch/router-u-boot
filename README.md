@@ -1,6 +1,9 @@
 U-Boot 1.1.4 modification for routers
 ==========
 
+Update: this one compiles with toolchain.
+
+
 Wichtiger Hinweis zum c't-Artikel
 ---------------------------------
 In den Artikel hat sich ein Fehler eingeschlichen.
