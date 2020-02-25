@@ -322,7 +322,6 @@ rel_start:
 	la   t9, simple_mips_cache_reset
 	jalr t9
 	nop
-#endif
 
 	/* ... and enable them */
 #if (SOC_TYPE & QCA_AR934X_SOC)
