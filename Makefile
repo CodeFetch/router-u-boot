@@ -4,6 +4,12 @@
 # SPDX-License-Identifier: GPL-2.0
 #
 
+export BUILD_TOPDIR=$(PWD)
+export STAGING_DIR=$(BUILD_TOPDIR)/tmp
+
+export MAKECMD=make --silent ARCH=mips CROSS_COMPILE=mips-openwrt-linux-uclibc-
+export PATH:=$(BUILD_TOPDIR)/toolchain/bin/:$(PATH)
+
 SHELL = bash
 
 HOSTARCH := $(shell uname -m |        \
@@ -113,7 +119,7 @@ endef
 
 # $(1): file extension
 define img_name
-u-boot_mod__$@__$(shell date +"%Y%m%d")__$(call git_branch_hash)$(if \
+router-u-boot-$@-$(shell date +"%Y%m%d")-$(call git_branch_hash)$(if \
 $(filter $(IMG_RAM),1),__RAM-LOAD-ONLY)$(if $(1),.$(1))
 endef
 

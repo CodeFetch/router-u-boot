@@ -296,7 +296,7 @@ void main_loop(void)
 		printf_err("failed to execute 'bootcmd'!\n");
 
 #if defined(CONFIG_CMD_HTTPD)
-		puts("   Starting web server for update...\n\n");
+		puts("Starting recovery mode...\n\n");
 		NetLoopHttpd();
 #else
 		puts("\n");

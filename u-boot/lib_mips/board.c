@@ -97,11 +97,24 @@ static int display_banner(void)
 	     "\n*                                     *");
 #endif
 
-	printf("\n***************************************"
-	       "\n*     %s     *"
-	       "\n*          Build: "
-	       MK_STR(CONFIG_BUILD_DATE_UTC) "          *"
-	       "\n***************************************\n\n",
+	printf("\n* * * * * * * * * * * * * * * * * * * *"
+	       "\n* ┬─┐┌─┐┬ ┬─┬─┌─┐┬─┐ ┬ ┬ ┌┐ ┌─┐┌─┐─┬─ *"
+	       "\n* ├┬┘│ ││ │ │ ├─ ├┬┘ │ │─├┴┐│ ││ │ │  *"
+	       "\n* ┴└─└─┘└─┘ ┴ └─┘┴└─ └─┘ └─┘└─┘└─┘ ┴  *"
+	       "\n*_.-._.-._.-._.-._.-._.-._.-._.-._.-._*"
+	       "\n*._.-._.-._.-._.-._.-._.-._.-._.-._.-.*"
+	       "\n*                                     *"
+	       "\n*            ) ) > ┬ < ( (            *"
+	       "\n*                 _│_                 *"
+	       "\n*                |   \\                *"
+	       "\n*    ._,---------'    `--------.      *"
+	       "\n*    +_      www.DEROWE.com     )     *"
+	       "\n*    ´ `-----------------------´      *"
+	       "\n*                                     *"
+	       "\n*   %s   *"
+	       "\n*       Build date: "
+	       MK_STR(CONFIG_BUILD_DATE_UTC) "        *"
+	       "\n* * * * * * * * * * * * * * * * * * * *\n\n",
 	       version_string);
 
 	return 0;
@@ -332,7 +345,7 @@ void board_init_r(gd_t *id, ulong dest_addr)
 	bd = gd->bd;
 
 #if defined(BOARD_DEBUG)
-	printf("Now running in RAM - U-Boot at: %08lX\n", dest_addr);
+	printf("Now running in RAM... U-Boot at: %08lX\n", dest_addr);
 #endif
 
 	/* We need (half of the) main CPU clock for udelay */
@@ -406,7 +419,7 @@ void board_init_r(gd_t *id, ulong dest_addr)
 		/* Use the one provided by board func */
 		macaddr_init(bd->bi_enetaddr);
 
-		/* And revrite it to env variable */
+		/* And rewrite it to env variable */
 		for (i = 0; i < 6; i++)
 			sprintf((char *)(buf + (i * 3)), "%02X%c",
 				bd->bi_enetaddr[i], i < 5 ? ':' : '\0');

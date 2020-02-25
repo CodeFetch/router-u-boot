@@ -30,8 +30,8 @@
 DECLARE_GLOBAL_DATA_PTR;
 
 list_t devlist = 0;
-device_t *stdio_devices[] = {NULL, NULL, NULL};
-char *stdio_names[MAX_FILES] = {"stdin", "stdout", "stderr"};
+device_t *stdio_devices[] = { NULL, NULL, NULL };
+char *stdio_names[MAX_FILES] = { "stdin", "stdout", "stderr" };
 
 /**************************************************************************
  * SYSTEM DRIVERS
@@ -59,6 +59,7 @@ static void drv_system_init(void){
  */
 int device_register(device_t * dev){
 	ListInsertItem(devlist, dev, LIST_END);
+
 	return(0);
 }
 
@@ -74,21 +75,21 @@ int device_deregister(char *devname){
 
 	dev_index=-1;
 
-	for(i=1; i<=ListNumItems(devlist); i++){
+	for(i = 1; i <= ListNumItems(devlist); i++){
 		dev = ListGetPtrToItem(devlist, i);
 
-		if(strcmp(dev->name,devname)==0){
+		if(0 == strcmp(dev->name,devname)){
 			dev_index=i;
 			break;
 		}
 	}
 
-	if(dev_index<0){ /* device not found */
+	if(dev_index < 0){ /* device not found */
 		return(0);
 	}
 
 	/* get stdio devices (ListRemoveItem changes the dev list) */
-	for(l=0; l< MAX_FILES; l++){
+	for(l=0; l < MAX_FILES; l++) {
 		if(stdio_devices[l] == dev){
 			/* Device is assigned -> report error */
 			return(-1);
@@ -96,14 +97,14 @@ int device_deregister(char *devname){
 		memcpy(&temp_names[l][0], stdio_devices[l]->name, sizeof(stdio_devices[l]->name));
 	}
 
-	ListRemoveItem(devlist,NULL,dev_index);
+	ListRemoveItem(devlist, NULL, dev_index);
 
 	/* reassign Device list */
-	for(i=1; i<=ListNumItems(devlist); i++){
+	for(i = 1; i <= ListNumItems(devlist); i++){
 		dev = ListGetPtrToItem(devlist, i);
 
-		for(l=0; l< MAX_FILES; l++){
-			if(strcmp(dev->name,temp_names[l])==0){
+		for(l = 0; l < MAX_FILES; l++) {
+			if(0 == strcmp(dev->name, temp_names[l])){
 				stdio_devices[l] = dev;
 			}
 		}
@@ -125,7 +126,7 @@ int devices_init(void){
 	/* Initialize the list */
 	devlist = ListCreate(sizeof(device_t));
 
-	if(devlist == NULL){
+	if(devlist == NULL) {
 		eputs("Cannot initialize the list of devices!\n");
 		return(-1);
 	}

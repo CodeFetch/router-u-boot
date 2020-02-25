@@ -54,8 +54,8 @@
 #if defined(ENV_IS_EMBEDDED)
 /*
  * Only put the environment in it's own section when we are building
- * U-Boot proper.  The host based program "tools/envcrc" does not need
- * a seperate section.  Note that ENV_CRC is only defined when building
+ * U-Boot properly. The host program "tools/envcrc" does not need
+ * a separate section. Note that ENV_CRC is only defined when building
  * U-Boot itself.
  */
 #if (defined(CONFIG_CMI)      ||\

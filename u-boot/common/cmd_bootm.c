@@ -365,7 +365,7 @@ static int ih_header_crc(image_header_t *hdr, int tpl_type)
 }
 
 /*
- * Converts TP-Link header to stanard
+ * Converts TP-Link header to standard
  * U-Boot image format header
  */
 static void tpl_to_uboot_header(image_header_t *hdr,

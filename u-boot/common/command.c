@@ -22,12 +22,11 @@
  */
 
 int _do_help(cmd_tbl_t *cmd_start, int cmd_items, cmd_tbl_t *cmdtp, int flag,
-	     int argc, char * const argv[])
-{
+	     int argc, char * const argv[]) {
 	int i;
 	int rcode = 0;
 
-	if (argc == 1) {	/* show list of commands */
+	if (argc == 1) { /* show list of commands */
 		cmd_tbl_t *cmd_array[cmd_items];
 		int i, j, swaps;
 
@@ -68,9 +67,8 @@ int _do_help(cmd_tbl_t *cmd_start, int cmd_items, cmd_tbl_t *cmdtp, int flag,
 		}
 		return 0;
 	}
-	/*
-	 * command help (long version)
-	 */
+
+	/* command help (long version) */
 	for (i = 1; i < argc; ++i) {
 		cmdtp = find_cmd_tbl(argv[i], cmd_start, cmd_items);
 		if (cmdtp != NULL) {
@@ -81,12 +79,12 @@ int _do_help(cmd_tbl_t *cmd_start, int cmd_items, cmd_tbl_t *cmdtp, int flag,
 			rcode = 1;
 		}
 	}
+
 	return rcode;
 }
 
 /* find command table entry for a command */
-cmd_tbl_t *find_cmd_tbl(const char *cmd, cmd_tbl_t *table, int table_len)
-{
+cmd_tbl_t *find_cmd_tbl(const char *cmd, cmd_tbl_t *table, int table_len) {
 #ifdef CONFIG_CMDLINE
 	cmd_tbl_t *cmdtp;
 	cmd_tbl_t *cmdtp_temp = table;	/* Init value */
@@ -111,23 +109,23 @@ cmd_tbl_t *find_cmd_tbl(const char *cmd, cmd_tbl_t *table, int table_len)
 			n_found++;
 		}
 	}
-	if (n_found == 1) {			/* exactly one match */
+
+	if (n_found == 1) { /* exactly one match */
 		return cmdtp_temp;
 	}
 #endif /* CONFIG_CMDLINE */
 
-	return NULL;	/* not found or ambiguous command */
+	/* not found or ambiguous command */
+	return NULL;
 }
 
-cmd_tbl_t *find_cmd(const char *cmd)
-{
+cmd_tbl_t *find_cmd(const char *cmd) {
 	cmd_tbl_t *start = ll_entry_start(cmd_tbl_t, cmd);
 	const int len = ll_entry_count(cmd_tbl_t, cmd);
 	return find_cmd_tbl(cmd, start, len);
 }
 
-int cmd_usage(const cmd_tbl_t *cmdtp)
-{
+int cmd_usage(const cmd_tbl_t *cmdtp) {
 	printf("%s - %s\n\n", cmdtp->name, cmdtp->usage);
 
 #ifdef	CONFIG_SYS_LONGHELP
@@ -146,8 +144,7 @@ int cmd_usage(const cmd_tbl_t *cmdtp)
 
 #ifdef CONFIG_AUTO_COMPLETE
 
-int var_complete(int argc, char * const argv[], char last_char, int maxv, char *cmdv[])
-{
+int var_complete(int argc, char * const argv[], char last_char, int maxv, char *cmdv[]) {
 	static char tmp_buf[512];
 	int space;
 
@@ -164,8 +161,7 @@ int var_complete(int argc, char * const argv[], char last_char, int maxv, char *
 
 /*************************************************************************************/
 
-static int complete_cmdv(int argc, char * const argv[], char last_char, int maxv, char *cmdv[])
-{
+static int complete_cmdv(int argc, char * const argv[], char last_char, int maxv, char *cmdv[]) {
 #ifdef CONFIG_CMDLINE
 	cmd_tbl_t *cmdtp = ll_entry_start(cmd_tbl_t, cmd);
 	const int count = ll_entry_count(cmd_tbl_t, cmd);
@@ -191,6 +187,7 @@ static int complete_cmdv(int argc, char * const argv[], char last_char, int maxv
 			cmdv[n_found++] = cmdtp->name;
 		}
 		cmdv[n_found] = NULL;
+
 		return n_found;
 	}
 
@@ -201,6 +198,7 @@ static int complete_cmdv(int argc, char * const argv[], char last_char, int maxv
 			cmdv[0] = NULL;
 			return 0;
 		}
+
 		return (*cmdtp->complete)(argc, argv, last_char, maxv, cmdv);
 	}
 
@@ -245,18 +243,16 @@ int cmd_complete(int argc, char * const argv[], char last_char, int maxv, char *
 	return complete_cmdv(argc - 1, argv + 1, last_char, maxv, cmdv);
 }
 
-static int make_argv(char *s, int argvsz, char *argv[])
-{
+static int make_argv(char *s, int argvsz, char *argv[]) {
 	int argc = 0;
 
 	/* split into argv */
 	while (argc < argvsz - 1) {
-
 		/* skip any white space */
 		while (isblank(*s))
 			++s;
 
-		if (*s == '\0')	/* end of s, no more args	*/
+		if (*s == '\0') /* end of s, no more args	*/
 			break;
 
 		argv[argc++] = s;	/* begin of argument string	*/
@@ -265,18 +261,17 @@ static int make_argv(char *s, int argvsz, char *argv[])
 		while (*s && !isblank(*s))
 			++s;
 
-		if (*s == '\0')		/* end of s, no more args	*/
+		if (*s == '\0') /* end of s, no more args	*/
 			break;
 
-		*s++ = '\0';		/* terminate current arg	 */
+		*s++ = '\0';	/* terminate current arg	 */
 	}
-	argv[argc] = NULL;
 
+	argv[argc] = NULL;
 	return argc;
 }
 
-static void print_argv(const char *banner, const char *leader, const char *sep, int linemax, char * const argv[])
-{
+static void print_argv(const char *banner, const char *leader, const char *sep, int linemax, char * const argv[]) {
 	int ll = leader != NULL ? strlen(leader) : 0;
 	int sl = sep != NULL ? strlen(sep) : 0;
 	int len, i;
@@ -289,6 +284,7 @@ static void print_argv(const char *banner, const char *leader, const char *sep, 
 	i = linemax;	/* force leader and newline */
 	while (*argv != NULL) {
 		len = strlen(*argv) + sl;
+
 		if (i + len >= linemax) {
 			puts("\n");
 			if (leader)
@@ -296,14 +292,14 @@ static void print_argv(const char *banner, const char *leader, const char *sep, 
 			i = ll - sl;
 		} else if (sep)
 			puts(sep);
+
 		puts(*argv++);
 		i += len;
 	}
 	printf("\n");
 }
 
-static int find_common_prefix(char * const argv[])
-{
+static int find_common_prefix(char * const argv[]) {
 	int i, len;
 	char *anchor, *s, *t;
 
@@ -315,21 +311,23 @@ static int find_common_prefix(char * const argv[])
 	len = strlen(anchor);
 	while ((t = *argv++) != NULL) {
 		s = anchor;
+
 		for (i = 0; i < len; i++, t++, s++) {
 			if (*t != *s)
 				break;
 		}
+
 		len = s - anchor;
 	}
+
 	return len;
 }
 
 static char tmp_buf[CONFIG_SYS_CBSIZE + 1];	/* copy of console I/O buffer */
 
-int cmd_auto_complete(const char *const prompt, char *buf, int *np, int *colp)
-{
+int cmd_auto_complete(const char *const prompt, char *buf, int *np, int *colp) {
 	int n = *np, col = *colp;
-	char *argv[CONFIG_SYS_MAXARGS + 1];		/* NULL terminated	*/
+	char *argv[CONFIG_SYS_MAXARGS + 1];	/* NULL terminated */
 	char *cmdv[20];
 	char *s, *t;
 	const char *sep;
@@ -368,6 +366,7 @@ int cmd_auto_complete(const char *const prompt, char *buf, int *np, int *colp)
 	len = 0;
 	sep = NULL;
 	seplen = 0;
+
 	if (i == 1) { /* one match; perfect */
 		k = strlen(argv[argc - 1]);
 		s = cmdv[0] + k;
@@ -377,6 +376,7 @@ int cmd_auto_complete(const char *const prompt, char *buf, int *np, int *colp)
 	} else if (i > 1 && (j = find_common_prefix(cmdv)) != 0) { /* more */
 		k = strlen(argv[argc - 1]);
 		j -= k;
+
 		if (j > 0) {
 			s = cmdv[0] + k;
 			len = j;
@@ -385,6 +385,7 @@ int cmd_auto_complete(const char *const prompt, char *buf, int *np, int *colp)
 
 	if (s != NULL) {
 		k = len + seplen;
+
 		/* make sure it fits */
 		if (n + k >= CONFIG_SYS_CBSIZE - 2) {
 			putc('\a');
@@ -394,34 +395,37 @@ int cmd_auto_complete(const char *const prompt, char *buf, int *np, int *colp)
 		t = buf + cnt;
 		for (i = 0; i < len; i++)
 			*t++ = *s++;
+
 		if (sep != NULL)
 			for (i = 0; i < seplen; i++)
 				*t++ = sep[i];
+
 		*t = '\0';
 		n += k;
 		col += k;
 		puts(t - k);
+
 		if (sep == NULL)
 			putc('\a');
+
 		*np = n;
 		*colp = col;
 	} else {
 		print_argv(NULL, "  ", " ", 78, cmdv);
-
 		puts(prompt);
 		puts(buf);
 	}
+
 	return 1;
 }
 
 #endif
 
 #ifdef CMD_DATA_SIZE
-int cmd_get_data_size(char* arg, int default_size)
-{
-	/* Check for a size specification .b, .w or .l.
-	 */
+int cmd_get_data_size(char* arg, int default_size) {
 	int len = strlen(arg);
+
+	/* Check for a size specification .b, .w or .l. */
 	if (len > 2 && arg[len-2] == '.') {
 		switch (arg[len-1]) {
 		case 'b':
@@ -440,6 +444,7 @@ int cmd_get_data_size(char* arg, int default_size)
 			return -1;
 		}
 	}
+
 	return default_size;
 }
 #endif
@@ -447,17 +452,14 @@ int cmd_get_data_size(char* arg, int default_size)
 #if defined(CONFIG_NEEDS_MANUAL_RELOC)
 DECLARE_GLOBAL_DATA_PTR;
 
-void fixup_cmdtable(cmd_tbl_t *cmdtp, int size)
-{
-	int	i;
+void fixup_cmdtable(cmd_tbl_t *cmdtp, int size) {
+	int i;
 
 	if (gd->reloc_off == 0)
 		return;
 
 	for (i = 0; i < size; i++) {
-		ulong addr;
-
-		addr = (ulong)(cmdtp->cmd) + gd->reloc_off;
+		ulong addr = (ulong)(cmdtp->cmd) + gd->reloc_off;
 #ifdef DEBUG_COMMANDS
 		printf("Command \"%s\": 0x%08lx => 0x%08lx\n",
 		       cmdtp->name, (ulong)(cmdtp->cmd), addr);
@@ -466,6 +468,7 @@ void fixup_cmdtable(cmd_tbl_t *cmdtp, int size)
 			(int (*)(struct cmd_tbl_s *, int, int, char * const []))addr;
 		addr = (ulong)(cmdtp->name) + gd->reloc_off;
 		cmdtp->name = (char *)addr;
+
 		if (cmdtp->usage) {
 			addr = (ulong)(cmdtp->usage) + gd->reloc_off;
 			cmdtp->usage = (char *)addr;
@@ -499,20 +502,18 @@ void fixup_cmdtable(cmd_tbl_t *cmdtp, int size)
  * @param argv		Arguments
  * @return 0 if command succeeded, else non-zero (CMD_RET_...)
  */
-static int cmd_call(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
-{
-	int result;
+static int cmd_call(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[]) {
+	int result = (cmdtp->cmd)(cmdtp, flag, argc, argv);
 
-	result = (cmdtp->cmd)(cmdtp, flag, argc, argv);
 	if (result) {
 		debug("Command failed, result=%d\n", result);
 	}
+
 	return result;
 }
 
 enum command_ret_t cmd_process(int flag, int argc, char * const argv[],
-			       int *repeatable, ulong *ticks)
-{
+			       int *repeatable, ulong *ticks) {
 	enum command_ret_t rc = CMD_RET_SUCCESS;
 	cmd_tbl_t *cmdtp;
 
@@ -548,13 +549,14 @@ enum command_ret_t cmd_process(int flag, int argc, char * const argv[],
 			*ticks = get_timer(*ticks);
 		*repeatable &= cmdtp->repeatable;
 	}
+
 	if (rc == CMD_RET_USAGE)
 		rc = cmd_usage(cmdtp);
+
 	return rc;
 }
 
-int cmd_process_error(cmd_tbl_t *cmdtp, int err)
-{
+int cmd_process_error(cmd_tbl_t *cmdtp, int err) {
 	if (err) {
 		printf("Command '%s' failed: Error %d\n", cmdtp->name, err);
 		return 1;

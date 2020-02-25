@@ -14,8 +14,7 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-void serial_setbrg(void)
-{
+void serial_setbrg(void) {
 	u32 div;
 
 	/*
@@ -43,8 +42,7 @@ void serial_setbrg(void)
 	qca_soc_reg_read_clear(QCA_LSUART_LCR_REG, QCA_LSUART_LCR_DLAB_MASK);
 }
 
-int serial_init(void)
-{
+int serial_init(void) {
 	serial_setbrg();
 
 	/* No interrupt */
@@ -59,14 +57,12 @@ int serial_init(void)
 	 * - stop: 1bit
 	 * - parity: no
 	 */
-	qca_soc_reg_write(QCA_LSUART_LCR_REG,
-					  (u32)QCA_LSUART_LCR_CLS_8BIT_VAL << QCA_LSUART_LCR_CLS_SHIFT);
+	qca_soc_reg_write(QCA_LSUART_LCR_REG, (u32)QCA_LSUART_LCR_CLS_8BIT_VAL << QCA_LSUART_LCR_CLS_SHIFT);
 
 	return 0;
 }
 
-void serial_putc(const char c)
-{
+void serial_putc(const char c) {
 	u32 line_status;
 
 	if (c == '\n')
@@ -74,16 +70,14 @@ void serial_putc(const char c)
 
 	/* Wait for empty THR */
 	do {
-		line_status = qca_soc_reg_read(QCA_LSUART_LSR_REG)
-					  & QCA_LSUART_LSR_THRE_MASK;
+		line_status = qca_soc_reg_read(QCA_LSUART_LSR_REG) & QCA_LSUART_LSR_THRE_MASK;
 	} while (line_status == 0);
 
 	/* Put data in THR */
 	qca_soc_reg_write(QCA_LSUART_THR_REG, (u32)c);
 }
 
-int serial_getc(void)
-{
+int serial_getc(void) {
 	while (!serial_tstc())
 		;
 
@@ -92,15 +86,13 @@ int serial_getc(void)
 		   & QCA_LSUART_RBR_RBR_MASK;
 }
 
-int serial_tstc(void)
-{
+int serial_tstc(void) {
 	/* Check data ready bit */
 	return qca_soc_reg_read(QCA_LSUART_LSR_REG)
 		   & QCA_LSUART_LSR_DR_MASK;
 }
 
-void serial_puts(const char *s)
-{
+void serial_puts(const char *s) {
 	while (*s)
 		serial_putc(*s++);
 }
