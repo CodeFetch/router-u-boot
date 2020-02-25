@@ -34,6 +34,9 @@ host_util/lzma
 # build directory
 /build
 
+# toolchain directory
+/toolchain
+
 # Do not ignore original u-boot images
 !/original_u-boot_images/*.bin
 
