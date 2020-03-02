@@ -99,6 +99,21 @@ uchar default_environment[] = {
 #if defined(CONFIG_SERVERIP)
 	"serverip=" MK_STR(CONFIG_SERVERIP) "\0"
 #endif
+#if defined(CONFIG_TFTPIPADDR)
+	"tftp_ipaddr=" MK_STR(CONFIG_TFTPIPADDR) "\0"
+#elif defined(CONFIG_IPADDR)
+	"tftp_ipaddr=" MK_STR(CONFIG_IPADDR) "\0"
+#endif
+#if defined(CONFIG_TFTPSERVERIP)
+	"tftp_serverip=" MK_STR(CONFIG_TFTPSERVERIP) "\0"
+#elif defined(CONFIG_SERVERIP)
+	"tftp_serverip=" MK_STR(CONFIG_SERVERIP) "\0"
+#endif
+#if defined(CONFIG_WEBIPADDR)
+	"web_ipaddr=" MK_STR(CONFIG_WEBIPADDR) "\0"
+#elif defined(CONFIG_IPADDR)
+	"web_ipaddr=" MK_STR(CONFIG_IPADDR) "\0"
+#endif
 #if defined(CONFIG_AUTOLOAD)
 	"autoload=" MK_STR(CONFIG_AUTOLOAD) "\0"
 #endif
@@ -114,8 +129,15 @@ uchar default_environment[] = {
 #if defined(CONFIG_HOSTNAME)
 	"hostname=" MK_STR(CONFIG_HOSTNAME) "\0"
 #endif
-#if defined(CONFIG_BOOTFILE)
+#if defined(CONFIG_CUSTOM_BOOTFILE)
+	"bootfile=" MK_STR(CONFIG_CUSTOM_BOOTFILE) "\0"
+#elif defined(CONFIG_BOOTFILE)
 	"bootfile=" MK_STR(CONFIG_BOOTFILE) "\0"
+#endif
+#if defined(CONFIG_CUSTOM_UBOOTFILE)
+	"uboot_name=" MK_STR(CONFIG_CUSTOM_UBOOTFILE) "\0"
+#elif defined(CONFIG_UBOOTFILE)
+	"uboot_name=" MK_STR(CONFIG_UBOOTFILE) "\0"
 #endif
 #if defined(CONFIG_LOADADDR)
 	"loadaddr=" MK_STR(CONFIG_LOADADDR) "\0"

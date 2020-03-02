@@ -83,7 +83,6 @@
 #define CONFIG_NETCONSOLE_PORT	6666
 
 /* Other environment variables */
-#define CONFIG_BOOTFILE	firmware.bin
 #define CONFIG_LOADADDR	0x80800000
 #define CONFIG_AUTOLOAD	no
 #define CONFIG_BOOTP_RANDOM_DELAY	1

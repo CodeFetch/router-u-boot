@@ -731,6 +731,37 @@
 #endif
 
 /*
+ * =======================================
+ * For TFTP upgrade using the reset button
+ * =======================================
+ */
+
+/* TFTP client/server IP addresses */
+#if defined(CONFIG_FOR_TPLINK_WR841N_V9)  ||\
+    defined(CONFIG_FOR_TPLINK_WR841N_V10) ||\
+    defined(CONFIG_FOR_TPLINK_WR841N_V11)
+
+	#define CONFIG_TFTPIPADDR		192.168.0.86
+	#define CONFIG_TFTPSERVERIP		192.168.0.66
+
+#endif
+
+/* TFTP firmware filenames */
+#if defined(CONFIG_FOR_TPLINK_WR841N_V9)
+
+	#define CONFIG_CUSTOM_BOOTFILE	wr841nv9_tp_recovery.bin
+
+#elif defined(CONFIG_FOR_TPLINK_WR841N_V10)
+
+	#define CONFIG_CUSTOM_BOOTFILE	wr841nv10_tp_recovery.bin
+
+#elif defined(CONFIG_FOR_TPLINK_WR841N_V11)
+
+	#define CONFIG_CUSTOM_BOOTFILE	wr841nv11_tp_recovery.bin
+
+#endif
+
+/*
  * ===================
  * Other configuration
  * ===================

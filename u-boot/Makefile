@@ -202,8 +202,8 @@ define flash_size
 $(if $(1),$(strip $(1)),4)
 endef
 
-# $(1): vendor, board name/model
-# $(2): hostname
+# $(1): pretty vendor and board name/model (e.g. TP-Link TL-MR10U v1)
+# $(2): board name/model (e.g. tl-mr10u-v1)
 # $(3): default FLASH size in MB
 # $(4): reset button GPIO number
 # $(5): 1 if reset button is active low
@@ -248,7 +248,20 @@ define config_init
     $(call echo_yellow,  RAM-loadable only:\tno) \
   )
 
-  $(if $(2),$(call define_add,CONFIG_HOSTNAME,router-u-boot))
+  $(if $(2), \
+    $(call define_add,CONFIG_HOSTNAME,$(strip $(2))-boot), \
+    $(call define_add,CONFIG_HOSTNAME,router-u-boot),
+  )
+
+  $(if $(2), \
+    $(call define_add,CONFIG_BOOTFILE,$(strip $(2))_firmware.bin), \
+    $(call define_add,CONFIG_BOOTFILE,firmware.bin) \
+  )
+
+  $(if $(2), \
+    $(call define_add,CONFIG_UBOOTFILE,$(strip $(2))_u-boot.bin), \
+    $(call define_add,CONFIG_UBOOTFILE,u-boot.bin) \
+  )
 
   $(if $(4),$(call define_add,CONFIG_GPIO_RESET_BTN,$(strip $(4))))
   $(if $(filter $(5),1),$(call define_add,CONFIG_GPIO_RESET_BTN_ACTIVE_LOW,1))

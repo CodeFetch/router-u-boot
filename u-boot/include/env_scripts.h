@@ -2,6 +2,7 @@
  * Upgrade and recovery helper environment scripts
  *
  * Copyright (C) 2016 Piotr Dymacz <piotr@dymacz.pl>
+ * Copyright (C) 2019 Vincent Wiemann <vw@derowe.com>
  *
  * SPDX-License-Identifier: GPL-2.0
  */
@@ -17,19 +18,19 @@
 
 	/* Backup size: use image limit size by default */
 	#if !defined(CONFIG_UPG_SCRIPTS_UBOOT_SIZE_BCKP_HEX)
-		#define CONFIG_UPG_SCRIPTS_UBOOT_SIZE_BCKP_HEX	\
+		#define CONFIG_UPG_SCRIPTS_UBOOT_SIZE_BCKP_HEX \
 				CONFIG_MAX_UBOOT_SIZE_HEX
 	#endif
 
 	/* Target address: use CFG_FLASH_BASE by default */
 	#if !defined(CONFIG_UPG_SCRIPTS_UBOOT_ADDR_HEX)
-		#define CONFIG_UPG_SCRIPTS_UBOOT_ADDR_HEX	\
+		#define CONFIG_UPG_SCRIPTS_UBOOT_ADDR_HEX \
 				CFG_FLASH_BASE
 	#endif
 
 	/* Limit size: use image limit size by default */
 	#if !defined(CONFIG_UPG_SCRIPTS_UBOOT_SIZE_HEX)
-		#define CONFIG_UPG_SCRIPTS_UBOOT_SIZE_HEX	\
+		#define CONFIG_UPG_SCRIPTS_UBOOT_SIZE_HEX \
 				CONFIG_MAX_UBOOT_SIZE_HEX
 	#endif
 
@@ -43,7 +44,6 @@
 	#if (CONFIG_UPG_SCRIPTS_UBOOT_SIZE_BCKP_HEX == \
 	     CONFIG_UPG_SCRIPTS_UBOOT_SIZE_HEX)
 		#define CONFIG_ENV_UPG_SCRIPTS_UBOOT	\
-		"uboot_name=u-boot.bin\0" \
 		"uboot_addr=" MK_STR(CONFIG_UPG_SCRIPTS_UBOOT_ADDR_HEX) "\0" \
 		"uboot_size=" MK_STR(CONFIG_UPG_SCRIPTS_UBOOT_SIZE_HEX) "\0" \
 		"uboot_upg=" \
@@ -123,35 +123,123 @@
 		#error "Commands setexpr, itest, sleep, button and led{on, off} are required for recovery"
 	#endif
 
-	#if defined(CONFIG_CMD_HTTPD)
-		#define SCRIPT_HTTP_PART_1	\
-		"echo - 3s for web based recovery;"
+	/*
+	 * Blink as a special signal
+	 */
+	#define SCRIPT_BLINK \
+		"ledon;" \
+		"sleep 250;" \
+		"ledoff;" \
+		"sleep 250;" \
+		"ledon;" \
+		"sleep 250;" \
+		"ledoff;" \
+		"sleep 250;" \
+		"ledon;"
 
-		#define SCRIPT_HTTP_PART_2	\
-		"elif itest $cnt >= 3; then " \
-			"echo HTTP server is starting for firmware update...;" \
-			"setenv stop_boot 1;" \
-			"echo;" \
-			"httpd;" \
-		"elif itest $cnt < 3; then "
+
+	/*
+	 * DHCP client
+	 */
+	#if defined(CONFIG_CMD_DHCP)
+		#define SCRIPT_DHCP \
+			"echo Trying to acquire a DHCP lease...;" \
+			"dhcp;" \
+			SCRIPT_BLINK
+	#else
+		#define SCRIPT_DHCP	""
+	#endif
+
+	/*
+	 * TFTP recovery
+	 */
+	#if defined(CONFIG_CMD_DHCP)
+		#define SCRIPT_TFTP_PART_1_DHCP \
+			"echo - 5s for TFTP firmware recovery using DHCP;" 
+		#define SCRIPT_TFTP_PART_2_DHCP \
+			"elif itest $cnt >= 0x5; then " \
+				"echo Starting TFTP firmware recovery using DHCP...;" \
+				"echo;" \
+				SCRIPT_DHCP \
+				"run fw_upg;"
+	#else
+		#define SCRIPT_TFTP_PART_1_DHCP ""
+		#define SCRIPT_TFTP_PART_2_DHCP ""
+	#endif
+
+	#define SCRIPT_TFTP_PART_1 \
+			"echo - 3s for TFTP firmware recovery using static IPs;" \
+			SCRIPT_TFTP_PART_1_DHCP
+
+	#define SCRIPT_TFTP_PART_2 \
+				SCRIPT_TFTP_PART_2_DHCP \
+				"elif itest $cnt >= 0x3; then " \
+					"echo Starting TFTP firmware recovery using static IPs...;" \
+					"setenv tmp_ipaddr $ipaddr;" \
+					"setenv tmp_serverip $serverip;" \
+					"setenv ipaddr $tftp_ipaddr;" \
+					"setenv serverip $tftp_serverip;" \
+					"echo;" \
+					"run fw_upg;" \
+					"setenv ipaddr $tmp_ipaddr;" \
+					"setenv serverip $tmp_serverip;" \
+					"setenv tmp_ipaddr;" \
+					"setenv tmp_serverip;"
+
+	/*
+	 * Web recovery
+	 */
+ 	#if defined(CONFIG_CMD_HTTPD)
+		#define SCRIPT_HTTP_PART_1_STATIC	"echo - 9s for Web recovery with static IP address;"
+		#define SCRIPT_HTTP_PART_2_STATIC \
+			"elif itest $cnt >= 9; then " \
+				"echo Starting webserver for firmware recovery...;" \
+				"setenv stop_boot 1;" \
+				"setenv tmp_ipaddr $ipaddr;" \
+				"setenv ipaddr $web_ipaddr;" \
+				"echo;" \
+				"httpd;" \
+				"setenv ipaddr $tmp_ipaddr;" \
+				"setenv tmp_ipaddr;"
+
+		#if defined(CONFIG_CMD_DHCP)
+			#define SCRIPT_HTTP_PART_1 \
+				"echo - 7s for Web recovery as DHCP client;" \
+				SCRIPT_HTTP_PART_1_STATIC
+
+			#define SCRIPT_HTTP_PART_2 \
+				SCRIPT_HTTP_PART_2_STATIC \
+				"elif itest $cnt >= 7; then " \
+					SCRIPT_DHCP \
+					"echo Starting webserver for firmware recovery using DHCP...;" \
+					"setenv stop_boot 1;" \
+					"echo;" \
+					"httpd;"
+		#else
+			#define SCRIPT_HTTP_PART_1	SCRIPT_HTTP_PART_1_STATIC
+			#define SCRIPT_HTTP_PART_2	SCRIPT_HTTP_PART_2_STATIC
+		#endif
 	#else
 		#define SCRIPT_HTTP_PART_1	""
 		#define SCRIPT_HTTP_PART_2	\
 		"elif itest $cnt < 5; then "
 	#endif
 
+	/*
+	 * Final recovery script
+	 */
 	#define CONFIG_ENV_BTN_RECOVERY_SCRIPT	\
 		"recovery=" \
 		"if button; then " \
 			"sleep 600;" \
 			"setenv cnt 0;" \
 			"setenv stop_boot;" \
-			"echo Keep button pressed for at least:;" \
+			"echo Keep the button pressed for at least:;" \
+			SCRIPT_TFTP_PART_1 \
 			SCRIPT_HTTP_PART_1 \
-			"echo - 5s for U-Boot console;" \
-			"echo - 7s for network console;" \
+			"echo - 12s for network console;" \
 			"echo;" \
-			"while button && itest $cnt < 0xA; do " \
+			"while button && itest $cnt < 0xE; do " \
 				"ledon;" \
 				"sleep 300;" \
 				"echo . \'\\\\c\';" \
@@ -160,24 +248,23 @@
 				"sleep 600;" \
 				"setexpr cnt $cnt + 1;" \
 			"done;" \
-			"echo 0x$cnt seconds;" \
 			"echo;" \
-			"if itest $cnt >= 0xA; then " \
-				"echo \\#\\# Error: 10s limit reached!;" \
+			"if itest $cnt >= 0xE; then " \
+				"echo \\#\\# Error: 14s limit reached.;" \
 				"echo Continuing normal boot...;" \
+				SCRIPT_BLINK \
 				"echo;" \
-			"elif itest $cnt >= 7; then " \
+			"elif itest $cnt >= 12; then " \
 				"echo Starting network console...;" \
 				"setenv stop_boot 1;" \
 				"echo;" \
 				"startnc;" \
-			"elif itest $cnt >= 5; then " \
-				"echo Starting U-Boot console...;" \
-				"setenv stop_boot 1;" \
-				"echo;" \
 			SCRIPT_HTTP_PART_2 \
-				"echo \\#\\# Error: button was not pressed long enough!;" \
+			SCRIPT_TFTP_PART_2 \
+			"elif itest $cnt < 3; then " \
+				"echo \\#\\# Error: the button was not pressed long enough!;" \
 				"echo Continuing normal boot...;" \
+				SCRIPT_BLINK \
 				"echo;" \
 			"fi;" \
 			"setenv cnt;" \
