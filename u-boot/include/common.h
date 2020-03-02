@@ -520,14 +520,15 @@ ulong	usec2ticks    (unsigned long usec);
 ulong	ticks2usec    (unsigned long ticks);
 int	init_timebase (void);
 
-/* lib_generic/vsprintf.c */
+/* lib_generic/vsnprintf.c */
 ulong	simple_strtoul(const char *cp,char **endp,unsigned int base);
 #ifdef CFG_64BIT_VSPRINTF
 unsigned long long	simple_strtoull(const char *cp,char **endp,unsigned int base);
 #endif
-long	simple_strtol(const char *cp,char **endp,unsigned int base);
-int	sprintf(char * buf, const char *fmt, ...);
-int	vsprintf(char *buf, const char *fmt, va_list args);
+long simple_strtol(const char *cp,char **endp,unsigned int base);
+int sprintf(char * buf, const char *fmt, ...);
+int vsprintf(char *buf, const char *fmt, va_list args);
+int vsnprintf(char *buf, size_t size, const char *fmt, va_list args);
 
 /* common/console.c */
 int	console_init_f(void);	/* Before relocation; uses the serial  stuff	*/

@@ -14,7 +14,7 @@ OBJS-y += ctype.o
 OBJS-y += display_options.o
 OBJS-y += string.o
 OBJS-y += unlzma_tiny.o
-OBJS-y += vsprintf.o
+OBJS-y += vsnprintf.o
 
 CPPFLAGS += -DCONFIG_LZMA=1
 
