@@ -1,20 +1,5 @@
-U-Boot 1.1.4 modification for routers
-==========
-
-Wichtiger Hinweis zum c't-Artikel
----------------------------------
-In den Artikel hat sich ein Fehler eingeschlichen.
-
-Der korrekte Befehl zum Schreiben der MAC-Adresse lautet:
-`printf "\xaa\xbb\xcc\xdd\xee\xff" | dd conv=notrunc ibs=1 obs=256 seek=508 count=6 of=out.bin`
-
-Ich bitte vielmals um Verzeihung.
-
-Ready snapshot/test images
---------------------------
-Starting from 24.09.2016, ready images, built on **Raspberry Pi 3** with **LEDE** toolchain, are available **[on my server](http://projects.dymacz.pl)**.
-
-Images are built and uploaded on FTP only when master branch in repository was updated - custom script checks this once per day. On the FTP you will find also toolchain which is used to build images.
+Bootloader for routers
+======================
 
 Table of contents
 -----------------
@@ -24,6 +9,7 @@ Table of contents
 - [Known issues](#known-issues)
 - [Modifications, changes](#modifications-changes)
 	- [Web server](#web-server)
+	- [TFTP firmware recovery](#tftp-firmware-recovery)
 	- [Network Console](#network-console)
 	- [Writable environment variables](#writable-environment-variables)
 	- [Other](#other)
@@ -35,11 +21,8 @@ Table of contents
 		- [Important notice!](#important-notice)
 		- [Step by step instructions](#step-by-step-instructions)
 	- [Using OpenWrt](#using-openwrt)
-	- [Using DD-WRT](#using-dd-wrt)
-- [How to use it?](#how-to-use-it)
 - [How to compile the code?](#how-to-compile-the-code)
     - [Building on Linux](#building-on-linux)
-    - [Building on OS X](#building-on-macos-os-x)
 - [FAQ](#faq)
 - [License, outdated sources etc.](#license-outdated-sources-etc)
 - [Credits](#credits)
@@ -47,23 +30,15 @@ Table of contents
 Introduction
 ------------
 
-In short, this project is a deep modification of **U-Boot 1.1.4** sources, mostly from **TP-Link**, but some code fragments were taken also from **D-Link**, **Netgear**, **ZyXEL** and **Belkin**. All these companies are using SDK from Qualcomm/Atheros which includes modified version of **U-Boot 1.1.4**.
+This project is based on Piotr Dymacz's [u-boot_mod](https://github.com/pepe2k/u-boot_mod). It aims to continue the great effort he put in creating a versatile fork of U-Boot with modifications specifically fit for off-the-shelf routers. In the long-term most of the U-Boot code will be replaced as the base of this fork (U-Boot 1.1.4) is far from upstream and most of U-Boot's newer features go beyond the scope of booting or recovering a router. This bootloader aims to be small in size while offering the wishful recovery methods for routers.
 
-You can download original sources from the following pages:
+You can find OEM sources for reference from the following pages:
 
 - [TP-Link GPL Code Center](http://www.tp-link.com/en/support/gpl/ "TP-Link GPL Code Center")
 - [D-Link GPL Source Code Support](http://tsd.dlink.com.tw/GPL.asp "D-Link GPL Source Code Support")
 - [NETGEAR Open Source Code for Programmers (GPL)](http://kb.netgear.com/app/answers/detail/a_id/2649/~/netgear-open-source-code-for-programmers-%28gpl%29 "NETGEAR Open Source Code for Programmers (GPL)")
 - [ZyXEL GPL-OSS](http://www.zyxel.com/us/en/form/gpl_oss_form.shtml "ZyXEL GPL-OSS")
 - [Belkin Open Source Code Center](http://www.belkin.com/us/support-article?articleNum=51238 "Belkin Open Source Code Center")
-
-The concept for this project came from another U-Boot modification, dedicated to a small and very popular TP-Link router - model **TL-WR703N**, which includes web fail safe mode: **[wr703n-uboot-with-web-failsafe](http://code.google.com/p/wr703n-uboot-with-web-failsafe/)**. I was using it and decided to make my own version, which could have some improvements, additional capabilities, support for different models and work with all modern web browsers.
-
-First version of this modification was introduced on **OpenWrt** forum in [this thread](https://forum.openwrt.org/viewtopic.php?id=43237), at the end of March 2013 and was dedicated only for TP-Link routers with **Atheros AR9331** SoC. Now, it supports also models from different manufacturers, devices with **Atheros AR934x**, **Qualcomm Atheros QCA953x**, **Qualcomm Atheros QCA955x** and other (in the near future **Qualcomm Atheros QCA956x** and **MediaTek MT762x**) are under development.
-
-You can find some information about previous versions of this project also on my [blog](http://www.tech-blog.pl), in [this article](http://www.tech-blog.pl/2013/03/29/zmodyfikowany-u-boot-dla-routerow-tp-link-z-atheros-ar9331-z-trybem-aktualizacji-oprogramowania-przez-www-i-konsola-sieciowa-netconsole/). It is in Polish, but [Google Translator](http://translate.google.com/translate?hl=pl&sl=pl&tl=en&u=http%3A%2F%2Fwww.tech-blog.pl%2F2013%2F03%2F29%2Fzmodyfikowany-u-boot-dla-routerow-tp-link-z-atheros-ar9331-z-trybem-aktualizacji-oprogramowania-przez-www-i-konsola-sieciowa-netconsole%2F&sandbox=1) will help you to understand it.
-
-If you like this project, you may [buy me a beer](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=FN3XW36YHSY2S&lc=US&item_name=For%20a%20great%20job%21&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted)!
 
 Supported devices
 -----------------
@@ -225,7 +200,7 @@ More information about supported devices:
 Known issues
 ------------
 
-~~Current release is not loading kernel from some versions of TP-Link's official firmware. If you want to use the so-called OFW in any of supported TP-Link's router, do not use this modification. I am working on a solution for this issue.~~
+~~Current release is not loading kernel from some versions of TP-Link's official firmware. If you want to use the so-called OFW in any of supported TP-Link's router, do not use this modification.~~
 
 Modifications, changes
 ----------------------
@@ -250,10 +225,21 @@ Web server contains 7 pages:
 
 ![](http://www.tech-blog.pl/wordpress/wp-content/uploads/2015/11/uboot_mod_uboot_upgrade.jpg)
 
+### TFTP firmware recovery
+
+When using TFTP firmware recovery with acquiring a DHCP lease the gateway IP address is expected to be the TFTP server.
+Otherwise the default TFTP server IP address is `192.168.1.1` and the default firmware image name is `MODEL_firmware.bin` (e.g. `tl-mr10u-v1_firmware.bin`).
+
+For some devices this IP address and the image name may differ to ensure compatibility with OEM firmware:
+
+- TP-Link
+  -  TL-WR841N v9 (`192.168.0.66` - `wr841nv9_tp_recovery.bin`)
+  -  TL-WR841N v10 (`192.168.0.66` - `wr841nv10_tp_recovery.bin`)
+  -  TL-WR841N v11 (`192.168.0.66` - `wr841nv11_tp_recovery.bin`)
 
 ### Network Console
 
-Second, very useful modification is a network console (it is a part of original U-Boot sources, but none of the manufacturers included it). It allows you to communicate with U-Boot console over the Ethernet, using UDP protocol (default UDP port: 6666, router IP: 192.168.1.1).
+The network console allows you to communicate with U-Boot console over the Ethernet, using UDP protocol (default UDP port: 6666, router IP: 192.168.1.1). It will be replaced with a telnet implementation in the future.
 
 ![](http://www.tech-blog.pl/wordpress/wp-content/uploads/2013/04/u-boot_mod_for_tp-link_with_ar9331_netconsole.jpg)
 
@@ -360,9 +346,11 @@ Moreover:
 - Automatic kernel booting can be interrupted using any key
 - Better UART serial console driver with support for different baud rates
 - Press and hold reset button to run:
-  - Web server (min. 3 seconds)
-  - U-Boot serial console (min. 5 seconds)
-  - U-Boot network console (min. 7 seconds)
+  - TFTP firmware recovery using static/hardcoded IPs (min. 3 seconds)
+  - TFTP firmware recovery using a DHCP server/gateway address (min. 5 seconds)
+  - Web recovery as a DHCP client (min. 7 seconds)
+  - Web recovery (min. 9 seconds)
+  - U-Boot network console (min. 12 seconds)
 - Additional commands (in comparison to the default version; availability depends on router model):
   -  defenv
   -  httpd
@@ -646,96 +634,6 @@ root@OpenWrt:/# u-boot-upgrade
 [info] Done!
 ```
 
-### Using DD-WRT
-
-**WARNING! This method is not recommended!**
-
-1. Login into the router using telnet or SSH and find out which of the mtd partitions is the first one. In DD-WRT it is usally called `RedBoot`:
-
-  ```
-  root@DD-WRT:~# cat /proc/mtd
-  dev:    size   erasesize  name
-  mtd0: 00020000 00010000 "RedBoot"
-  mtd1: 003c0000 00010000 "linux"
-  mtd2: 002c0000 00010000 "rootfs"
-  mtd3: 00010000 00010000 "ddwrt"
-  mtd4: 00010000 00010000 "nvram"
-  mtd5: 00010000 00010000 "board_config"
-  mtd6: 00400000 00010000 "fullflash"
-  mtd7: 00020000 00010000 "fullboot"
-  ```
-
-  In this case, for **TP-Link TL-MR3020**, the `RedBoot` partition is the one, which contains U-Boot and additional data (MAC address, model number, PIN).
-
-  **Warning!** If size of the first partition is smaller than the size of the modified U-Boot image, you should not continue!
-
-2. Using SCP or other method, transfer the new U-Boot image and corresponding MD5 file to the `/tmp` folder in device.
-
-  ```
-  root@DD-WRT:/tmp# ls -la
-  [...]
-  -rw-r--r--    1 root     root        125952 Nov  5  2015 uboot_for_tp-link_tl-mr3020.bin
-  -rw-r--r--    1 root     root            66 Nov  5  2015 uboot_for_tp-link_tl-mr3020.md5
-  [...]
-  ```
-
-3. Verify the MD5 sum of the image:
-
-  ```
-  root@DD-WRT:/tmp# md5sum uboot_for_tp-link_tl-mr3020.bin
-  aaae0f772ce007f7d1542b9233dd765b  uboot_for_tp-link_tl-mr3020.bin
-
-  root@DD-WRT:/tmp# cat uboot_for_tp-link_tl-mr3020.md5
-  aaae0f772ce007f7d1542b9233dd765b *uboot_for_tp-link_tl-mr3020.bin
-  ```
-
-4. Make a backup of the current `RedBoot` partition (`mtd0`):
-
-  ```
-  root@DD-WRT:/tmp# dd if=/dev/mtd0 of=uboot_factory.bin
-  256+0 records in
-  256+0 records out
-  ```
-
-5. Using SCP or other method, transfer backuped `RedBoot` original partition to some safe place (I highly recommended you to save backup somewhere!).
-
-6. You need to combine together original image and the one with U-Boot modification, but it seems that `dd` from DD-WRT does not support `conv=notrunc`, so we will use different approach:
-
-  ```
-  root@DD-WRT:/tmp# dd if=uboot_factory.bin of=uboot_rest.bin bs=1 skip=$(wc -c < uboot_for_tp-link_tl-mr3020.bin)
-  5120+0 records in
-  5120+0 records out
-
-  root@DD-WRT:/tmp# cat uboot_for_tp-link_tl-mr3020.bin uboot_rest.bin > uboot_new.bin
-  ```
-
-7. **Danger**: This is the point of no return, if you have any errors or problems, please revert the original image at any time using:
-
-  ```
-  root@DD-WRT:/tmp# mtd write uboot_factory.bin "RedBoot"
-  Unlocking RedBoot ...
-  Writing from uboot_orig.bin to RedBoot ...
-  ```
-
-8. Now, to actually flash the new image, run:
-
-  ```
-  root@DD-WRT:/tmp# mtd write uboot_new.bin "RedBoot"
-  Unlocking RedBoot ...
-  Writing from uboot_new.bin to RedBoot ...
-  ```
-
-9. If you are sure that everything went OK, you may reboot the device:
-
-  ```
-  root@DD-WRT:/tmp# reboot
-  ```
-
-How to use it?
---------------
-
-[TODO]
-
 How to compile the code?
 ------------------------
 
@@ -769,22 +667,6 @@ make tplink_wr703n
 ```
 
 will start building U-Boot image for **TP-Link TL-WR703N**.
-
-### Building on macOS (OS X)
-
-You can build using the OpenWrt/LEDE toolchain as above under macOS (OS X) as long as you install several gnu command line tools via brew. Note that bash is required to correct the usage of colorized echo output within the Makefiles (I was suprised how inconsistent FreeBSD is with Linux/GNU in this regard).
-
-```
-brew install bash coreutils gnu-sed
-```
-
-Subsequently, in addition to the toolchain being in your path, you will need to point your path as instructed by brew to the gnu binaries (only required for the build).
-
-```
-export PATH=/usr/local/opt/coreutils/libexec/gnubin:/usr/local/opt/gnu-sed/libexec/gnubin:$PATH
-```
-
-This process was tested on Yosemite and El Capitan.
 
 FAQ
 ---
@@ -823,7 +705,5 @@ You should know, that most routers, especially those based on Atheros SoCs, uses
 Credits
 -------
 
-- Thanks to M-K O'Connell for donating a router with QCA9563
-- Thanks to Krzysztof M. for donating a TL-WDR3600 router
-- Thanks to *pupie* from OpenWrt forum for his great help
+- Thanks to Piotr Dymacz for creating [u-boot_mod](https://github.com/pepe2k/u-boot_mod)
 - Thanks for all donators and for users who contributed in code development
