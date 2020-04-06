@@ -957,8 +957,9 @@ gpio_setup:
  *
  * FIXME!
  */
-#if defined(CONFIG_FOR_YUNCORE_AP90Q)  ||\
-    defined(CONFIG_FOR_YUNCORE_CPE830) ||\
+#if defined(CONFIG_FOR_JOY_IT_JT_OR750I) ||\
+    defined(CONFIG_FOR_YUNCORE_AP90Q)    ||\
+    defined(CONFIG_FOR_YUNCORE_CPE830)   ||\
     defined(CONFIG_FOR_YUNCORE_T830)
 	li t8, 0
 	li t9, 0x7530

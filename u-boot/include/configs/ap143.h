@@ -171,8 +171,8 @@
 	#define CONFIG_QCA_GPIO_MASK_LED_ACT_L	GPIO0 | GPIO1 | GPIO2  |\
 						GPIO3 | GPIO4 | GPIO12 |\
 						GPIO16
-
-#elif defined(CONFIG_FOR_YUNCORE_T830)
+#elif defined(CONFIG_FOR_JOY_IT_JT_OR750I) ||\
+      defined(CONFIG_FOR_YUNCORE_T830)
 
 	#define CONFIG_QCA_GPIO_MASK_LED_ACT_L	GPIO4  | GPIO11 | GPIO12 |\
 						GPIO13 | GPIO14 | GPIO15 |\
@@ -279,8 +279,9 @@
 				"rootfstype=jffs2 init=/sbin/init "\
 				"mtdparts=ath-nor0:256k(u-boot),64k(u-boot-env),6336k(rootfs),1408k(uImage),64k(mib0),64k(ART)"
 
-#elif defined(CONFIG_FOR_WHQX_E600G_V2)   ||\
-      defined(CONFIG_FOR_WHQX_E600GAC_V2) ||\
+#elif defined(CONFIG_FOR_JOY_IT_JT_OR750I) ||\
+      defined(CONFIG_FOR_WHQX_E600G_V2)    ||\
+      defined(CONFIG_FOR_WHQX_E600GAC_V2)  ||\
       defined(CONFIG_FOR_YUNCORE_T830)
 
 	#define CONFIG_BOOTARGS	"console=ttyS0,115200 root=31:02 "\
@@ -321,6 +322,7 @@
 	#define CFG_LOAD_ADDR	0x9F020000
 
 #elif defined(CONFIG_FOR_GLINET_GL_AR300M_LITE) ||\
+      defined(CONFIG_FOR_JOY_IT_JT_OR750I)      ||\
       defined(CONFIG_FOR_P2W_CPE505N)           ||\
       defined(CONFIG_FOR_P2W_R602N)             ||\
       defined(CONFIG_FOR_WALLYS_DR531)          ||\
@@ -339,11 +341,11 @@
 
 #endif
 
-#if defined(CONFIG_FOR_P2W_CPE505N)    ||\
-    defined(CONFIG_FOR_P2W_R602N)      ||\
-    defined(CONFIG_FOR_YUNCORE_AP90Q)  ||\
-    defined(CONFIG_FOR_YUNCORE_CPE830) ||\
-    defined(CONFIG_FOR_YUNCORE_T830)   ||\
+#if defined(CONFIG_FOR_P2W_CPE505N)      ||\
+    defined(CONFIG_FOR_P2W_R602N)        ||\
+    defined(CONFIG_FOR_YUNCORE_AP90Q)    ||\
+    defined(CONFIG_FOR_YUNCORE_CPE830)   ||\
+    defined(CONFIG_FOR_YUNCORE_T830)     ||\
     defined(CONFIG_FOR_ZBTLINK_ZBT_WE1526)
 
 	#define CONFIG_BOOTCOMMAND	"bootm 0x9F050000 || bootm 0x9FE80000"
@@ -402,11 +404,12 @@
 	#define CFG_ENV_SIZE		0x10000
 	#define CFG_ENV_SECT_SIZE	0x10000
 
-#elif defined(CONFIG_FOR_P2W_CPE505N)    ||\
-      defined(CONFIG_FOR_P2W_R602N)      ||\
-      defined(CONFIG_FOR_YUNCORE_AP90Q)  ||\
-      defined(CONFIG_FOR_YUNCORE_CPE830) ||\
-      defined(CONFIG_FOR_YUNCORE_T830)   ||\
+#elif defined(CONFIG_FOR_JOY_IT_JT_OR750I) ||\
+      defined(CONFIG_FOR_P2W_CPE505N)      ||\
+      defined(CONFIG_FOR_P2W_R602N)        ||\
+      defined(CONFIG_FOR_YUNCORE_AP90Q)    ||\
+      defined(CONFIG_FOR_YUNCORE_CPE830)   ||\
+      defined(CONFIG_FOR_YUNCORE_T830)     ||\
       defined(CONFIG_FOR_ZBTLINK_ZBT_WE1526)
 
 	#define CFG_ENV_ADDR		0x9F040000
@@ -453,6 +456,7 @@
 #elif defined(CONFIG_FOR_GAINSTRONG_OOLITE_V5_2)     ||\
       defined(CONFIG_FOR_GAINSTRONG_OOLITE_V5_2_DEV) ||\
       defined(CONFIG_FOR_GLINET_GL_AR300M_LITE)      ||\
+      defined(CONFIG_FOR_JOY_IT_JT_OR750I)           ||\
       defined(CONFIG_FOR_P2W_CPE505N)                ||\
       defined(CONFIG_FOR_P2W_R602N)                  ||\
       defined(CONFIG_FOR_YUNCORE_AP90Q)              ||\
@@ -594,6 +598,7 @@
 
 #elif defined(CONFIG_FOR_GLINET_GL_AR300M_LITE) ||\
       defined(CONFIG_FOR_GLINET_GL_AR750)       ||\
+      defined(CONFIG_FOR_JOY_IT_JT_OR750I)      ||\
       defined(CONFIG_FOR_P2W_CPE505N)           ||\
       defined(CONFIG_FOR_P2W_R602N)             ||\
       defined(CONFIG_FOR_WALLYS_DR531)          ||\
@@ -676,11 +681,12 @@
 	#define CONFIG_QCA_PLL_IN_FLASH_BLOCK_OFFSET	0x50000
 	#define CONFIG_QCA_PLL_IN_FLASH_BLOCK_SIZE	0x10000
 
-#elif defined(CONFIG_FOR_P2W_CPE505N)    ||\
-      defined(CONFIG_FOR_P2W_R602N)      ||\
-      defined(CONFIG_FOR_YUNCORE_AP90Q)  ||\
-      defined(CONFIG_FOR_YUNCORE_CPE830) ||\
-      defined(CONFIG_FOR_YUNCORE_T830)   ||\
+#elif defined(CONFIG_FOR_JOY_IT_JT_OR750I) ||\
+      defined(CONFIG_FOR_P2W_CPE505N)      ||\
+      defined(CONFIG_FOR_P2W_R602N)        ||\
+      defined(CONFIG_FOR_YUNCORE_AP90Q)    ||\
+      defined(CONFIG_FOR_YUNCORE_CPE830)   ||\
+      defined(CONFIG_FOR_YUNCORE_T830)     ||\
       defined(CONFIG_FOR_ZBTLINK_ZBT_WE1526)
 
 	#define CONFIG_QCA_PLL_IN_FLASH_BLOCK_OFFSET	0x40000
@@ -705,6 +711,7 @@
     !defined(CONFIG_FOR_COMFAST_CF_E530N)      &&\
     !defined(CONFIG_FOR_GLINET_GL_AR300M_LITE) &&\
     !defined(CONFIG_FOR_GLINET_GL_AR750)       &&\
+    !defined(CONFIG_FOR_JOY_IT_JT_OR750I)      &&\
     !defined(CONFIG_FOR_P2W_CPE505N)           &&\
     !defined(CONFIG_FOR_P2W_R602N)             &&\
     !defined(CONFIG_FOR_WALLYS_DR531)          &&\
@@ -719,11 +726,12 @@
 
 #endif
 
-#if defined(CONFIG_FOR_P2W_CPE505N)    ||\
-    defined(CONFIG_FOR_P2W_R602N)      ||\
-    defined(CONFIG_FOR_YUNCORE_AP90Q)  ||\
-    defined(CONFIG_FOR_YUNCORE_CPE830) ||\
-    defined(CONFIG_FOR_YUNCORE_T830)   ||\
+#if defined(CONFIG_FOR_JOY_IT_JT_OR750I) ||\
+    defined(CONFIG_FOR_P2W_CPE505N)      ||\
+    defined(CONFIG_FOR_P2W_R602N)        ||\
+    defined(CONFIG_FOR_YUNCORE_AP90Q)    ||\
+    defined(CONFIG_FOR_YUNCORE_CPE830)   ||\
+    defined(CONFIG_FOR_YUNCORE_T830)     ||\
     defined(CONFIG_FOR_ZBTLINK_ZBT_WE1526)
 
 	#define CONFIG_UPG_SCRIPTS_FW_ADDR_HEX	0x9F050000
@@ -731,13 +739,14 @@
 #endif
 
 /*
- * =======================================
- * For TFTP upgrade using the reset button
- * =======================================
+ * ======================
+ * Recovery mode settings
+ * ======================
  */
 
 /* TFTP client/server IP addresses */
-#if defined(CONFIG_FOR_TPLINK_WR841N_V9)  ||\
+#if defined(CONFIG_FOR_JOY_IT_JT_OR750I)  ||\
+    defined(CONFIG_FOR_TPLINK_WR841N_V9)  ||\
     defined(CONFIG_FOR_TPLINK_WR841N_V10) ||\
     defined(CONFIG_FOR_TPLINK_WR841N_V11)
 
@@ -758,6 +767,14 @@
 #elif defined(CONFIG_FOR_TPLINK_WR841N_V11)
 
 	#define CONFIG_CUSTOM_BOOTFILE	wr841nv11_tp_recovery.bin
+
+#endif
+
+
+/* Web recovery IP address */
+#if defined(CONFIG_FOR_JOY_IT_JT_OR750I)
+
+	#define CONFIG_WEBIPADDR		10.123.123.1
 
 #endif
 

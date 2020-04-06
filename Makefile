@@ -295,6 +295,7 @@ engenius_ens202ext \
 gl-inet_gl-ar300 \
 gl-inet_gl-ar300m-lite \
 gl-inet_gl-ar750 \
+joy-it_jt-or750i \
 p2w_cpe505n \
 p2w_r602n \
 yuncore_ap90q \
