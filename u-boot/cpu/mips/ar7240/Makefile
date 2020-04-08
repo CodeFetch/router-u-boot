@@ -18,11 +18,11 @@ endif
 
 ifeq ($(BOARD), db12x)
 	OBJS-y += ag934x.o
-	OBJS-y += qca95xx_pll_init.o
+	OBJS-y += ar934x_qca953x_qca955x_pll_init.o
 endif
 
 ifeq ($(BOARD), ap143)
-	OBJS-y += qca95xx_pll_init.o
+	OBJS-y += ar934x_qca953x_qca955x_pll_init.o
 endif
 
 ifeq ($(BOARD), ap152)

@@ -26,7 +26,7 @@
 	#define PMU1_ADDRESS	0x18116cc0
 	#define PMU2_ADDRESS	0x18116cc4
 #else
-	#include <soc/qca95xx_pll_init.h>
+	#include <soc/qca953x_pll_init.h>
 #endif
 
 #define QCA_DDR_SIZE_INCREMENT	(8 * 1024 * 1024)
@@ -873,7 +873,7 @@ void qca_dram_init(void)
 		qca_soc_reg_write(QCA_DDR_RD_DATA_THIS_CYCLE_REG, 0xFFFF);
 	}
 
-	/* If DDR_CLK < 2 * AHB_CLK, set DDR FSM wait control to QCA_DDR_FSM_WAIT_CTRL_VAL (0xA24) */
+	/* If DDR_CLK < 2 * AHB_CLK, set DDR FSM wait control to QCA_DDR_FSM_WAIT_CTRL_VAL */
 	if (ddr_clk < (2 * ahb_clk))
 		qca_soc_reg_write(QCA_DDR_FSM_WAIT_CTRL_REG, QCA_DDR_FSM_WAIT_CTRL_VAL);
 

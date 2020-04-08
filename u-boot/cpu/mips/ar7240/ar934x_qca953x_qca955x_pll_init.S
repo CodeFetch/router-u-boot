@@ -1,8 +1,9 @@
 /*
  * PLL and clocks configurations for
- * Qualcomm/Atheros AR934x and QCA95xx WiSoCs
+ * Qualcomm/Atheros AR934x, QCA953x and QCA955x WiSoCs
  *
  * Copyright (C) 2016 Piotr Dymacz <piotr@dymacz.pl>
+ * Copyright (C) 2020 Vincent Wiemann <vw@derowe.com>
  *
  * SPDX-License-Identifier: GPL-2.0
  */
@@ -10,7 +11,15 @@
 #include <soc/qca_pll_list.h>
 #include <config.h>
 #include <soc/qca_soc_common.h>
-#include <soc/qca95xx_pll_init.h>
+
+#if (SOC_TYPE & QCA_AR934X_SOC)
+	#include <soc/ar934x_pll_init.h>
+#elif (SOC_TYPE & QCA_QCA953X_SOC)
+	#include <soc/qca953x_pll_init.h>
+#elif (SOC_TYPE & QCA_QCA955X_SOC)
+	#include <soc/qca955x_pll_init.h>
+#endif
+
 #include <asm/regdef.h>
 #include <asm/mipsregs.h>
 #include <asm/addrspace.h>

@@ -107,7 +107,7 @@
 	((_ahb_from_ddrpll << QCA_PLL_CPU_DDR_CLK_CTRL_AHBCLK_FROM_DDRPLL_SHIFT) &\
 	 QCA_PLL_CPU_DDR_CLK_CTRL_AHBCLK_FROM_DDRPLL_MASK))
 
-/* SPI_CONTROL_ADDR same than _qca95xx_spi_ctrl_addr_reg_val */
+/* SPI_CONTROL_ADDR same than _qca953x_spi_ctrl_addr_reg_val */
 #define _qca956x_spi_ctrl_addr_reg_val(_clk_div,   \
 				       _remap_dis, \
 				       _reloc_spi, \
@@ -409,9 +409,6 @@
 #ifndef QCA_SPI_CTRL_REG_VAL
 	#define QCA_SPI_CTRL_REG_VAL			_qca956x_spi_ctrl_addr_reg_val(14, 1, 0, 2)
 #endif
-
-
-
 
 
 	/* Common */
