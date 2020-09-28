@@ -177,35 +177,7 @@ static char * number(char * str, long num, int base, int size, int precision ,in
 /* Forward decl. needed for IP address printing stuff... */
 int sprintf(char * buf, const char *fmt, ...);
 
-
-
-
-int sprintf(char * buf, const char *fmt, ...){
-	va_list args;
-	int i;
-
-	va_start(args, fmt);
-	i = vsprintf(buf,fmt,args);
-	va_end(args);
-	return i;
-}
-
-static void putnc(char **buf, char *end, char c) {
-    if (*buf < end)
-        **buf = c;
-    ++*buf;
-}
-
-/**
- * vsnprintf - Format a string and place it in a buffer
- * @buf: The buffer to place the result into
- * @size: The size of the buffer, including the trailing null space
- * @fmt: The format string to use
- * @args: Arguments for the format string
- *
- * Return: needed size for putting the whole string into the buffer
- */
-int vsnprintf(char *buf, size_t size, const char *fmt, va_list args) {
+int vsprintf(char *buf, const char *fmt, va_list args){
 	int len;
 #ifdef CFG_64BIT_VSPRINTF
 	unsigned long long num;
@@ -213,7 +185,7 @@ int vsnprintf(char *buf, size_t size, const char *fmt, va_list args) {
 	unsigned long num;
 #endif
 	int i, base;
-	char *str, *end;
+	char * str;
 	const char *s;
 
 	int flags;		/* flags to number() */
@@ -223,23 +195,9 @@ int vsnprintf(char *buf, size_t size, const char *fmt, va_list args) {
 				   number of chars for from string */
 	int qualifier;		/* 'h', 'l', or 'q' for integer fields */
 
-	/* Reject out-of-range values early.  Large positive sizes are
-	   used for unknown buffer sizes. */
-	if(size > 2147483647)
-		return 0;
-
-	str = buf;
-	end = buf + size;
-
-	/* Make sure end is always >= buf */
-	if(end < buf) {
-		end = ((void *)-1);
-		size = end - buf;
-	}
-
-	while(*fmt) {
-		if(*fmt != '%') {
-			putnc((char **)&str, end, *fmt);
+	for (str=buf ; *fmt ; ++fmt) {
+		if (*fmt != '%') {
+			*str++ = *fmt;
 			continue;
 		}
 
@@ -257,9 +215,9 @@ int vsnprintf(char *buf, size_t size, const char *fmt, va_list args) {
 
 		/* get field width */
 		field_width = -1;
-		if(is_digit(*fmt)) {
+		if (is_digit(*fmt))
 			field_width = skip_atoi(&fmt);
-		} else if(*fmt == '*') {
+		else if (*fmt == '*') {
 			++fmt;
 			/* it's the next argument */
 			field_width = va_arg(args, int);
@@ -271,7 +229,7 @@ int vsnprintf(char *buf, size_t size, const char *fmt, va_list args) {
 
 		/* get the precision */
 		precision = -1;
-		if(*fmt == '.') {
+		if (*fmt == '.') {
 			++fmt;
 			if (is_digit(*fmt))
 				precision = skip_atoi(&fmt);
@@ -286,7 +244,7 @@ int vsnprintf(char *buf, size_t size, const char *fmt, va_list args) {
 
 		/* get the conversion qualifier */
 		qualifier = -1;
-		if(*fmt == 'h' || *fmt == 'l' || *fmt == 'q') {
+		if (*fmt == 'h' || *fmt == 'l' || *fmt == 'q') {
 			qualifier = *fmt;
 			++fmt;
 		}
@@ -315,9 +273,9 @@ int vsnprintf(char *buf, size_t size, const char *fmt, va_list args) {
 				while (len < field_width--)
 					*str++ = ' ';
 			for (i = 0; i < len; ++i)
-				putnc((char **)&str, end, *s++);
+				*str++ = *s++;
 			while (len < field_width--)
-				putnc((char **)&str, end, ' ');
+				*str++ = ' ';
 			continue;
 
 		case 'p':
@@ -342,7 +300,7 @@ int vsnprintf(char *buf, size_t size, const char *fmt, va_list args) {
 			continue;
 
 		case '%':
-			putnc((char **)&str, end, '%');
+			*str++ = '%';
 			continue;
 
 		/* integer number formats - set up the flags and "break" */
@@ -363,9 +321,9 @@ int vsnprintf(char *buf, size_t size, const char *fmt, va_list args) {
 			break;
 
 		default:
-			putnc((char **)&str, end, '%');
+			*str++ = '%';
 			if (*fmt)
-				putnc((char **)&str, end, *fmt);
+				*str++ = *fmt;
 			else
 				--fmt;
 			continue;
@@ -386,33 +344,17 @@ int vsnprintf(char *buf, size_t size, const char *fmt, va_list args) {
 		else
 			num = va_arg(args, unsigned int);
 		str = number(str, num, base, field_width, precision, flags);
-		
-		++fmt;
 	}
-
-	if (size > 0) {
-		if (str < end)
-			*str = '\0';
-		else
-			end[-1] = '\0';
-	}
-
-	return str - buf;
+	*str = '\0';
+	return str-buf;
 }
 
-/**
- * vsprintf - Format a string and output it to a buffer
- * @buf: The buffer to place the result into
- * @fmt: The format string to use
- * @args: Arguments for the format string
- *
- * Note: Use vsnprintf() or vscnprintf() in order to avoid
- * buffer overflows.
- *
- * If you're not already dealing with a va_list consider using sprintf().
- *
- * Return: the number of characters written into @buf
- */
-int vsprintf(char *buf, const char *fmt, va_list args) {
-	return vsnprintf(buf, 2147483647, fmt, args);
+int sprintf(char * buf, const char *fmt, ...){
+	va_list args;
+	int i;
+
+	va_start(args, fmt);
+	i=vsprintf(buf,fmt,args);
+	va_end(args);
+	return i;
 }
