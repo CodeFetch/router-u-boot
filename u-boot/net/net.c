@@ -1417,8 +1417,14 @@ void NetReceiveHttpd(volatile uchar * inpkt, int len){
 		uip_arp_ipin();
 		uip_input();
 
-		if(uip_len > 0){
-			uip_arp_out();
+		if(uip_len > 0) {
+			if(!memcmp(eth_hdr->src.addr, 0, 6)) { /*TODO also do it if type is not IP*/
+				uip_arp_out();
+			} else {
+				uip_len += sizeof(struct uip_eth_hdr);
+				memcpy(eth_hdr->dest.addr, eth_hdr->src.addr, 6);
+				memcpy(eth_hdr->src.addr, NetOurEther, 6);
+			}
 			NetSendHttpd();
 		}
 	} else if(eth_hdr->type == htons(UIP_ETHTYPE_ARP)){

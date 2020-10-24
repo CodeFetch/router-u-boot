@@ -111,7 +111,7 @@ static int display_banner(void)
 	       "\n*    +_      www.DEROWE.com     )     *"
 	       "\n*    ´ `-----------------------´      *"
 	       "\n*                                     *"
-	       "\n*   %s   *"
+	       "\n* %s  *"
 	       "\n*       Build date: "
 	       MK_STR(CONFIG_BUILD_DATE_UTC) "        *"
 	       "\n* * * * * * * * * * * * * * * * * * * *\n\n",

@@ -10,6 +10,7 @@ OBJS-y += uip.o
 OBJS-y += uip_arch.o
 OBJS-y += uip_arp.o
 OBJS-y += httpd.o
+OBJS-y += minidhcpd.o
 OBJS-y += fs.o
 
 # Suppress warnings when building with size optimization

@@ -211,13 +211,11 @@ Modifications, changes
 
 ### Web server
 
-The most important change is an inclusion of a web server, based on **[uIP 0.9 TCP/IP stack](https://github.com/adamdunkels/uip/tags)**. It allows to upgrade **firmware**, **U-Boot** and **ART** (Atheros Radio Test) images, directly from your web browser, without need to access serial console and running a TFTP server. You can find similar firmware recovery mode, also based on uIP 0.9 TCP/IP stack, in **D-Link** routers.
+This bootloader includes a web and a DHCP server. It allows to upgrade **firmware**, **U-Boot** and **ART** (Atheros Radio Test) images, directly from your web browser, without need to access serial console and running a TFTP server.
 
-The web server is accessible at `192.168.1.1` by default. For some vendors this address differs:
+The web server is accessible at `10.123.123.1` by default.
 
-- Joy-IT (`10.123.123.1`)
-
-Web server contains 7 pages:
+It contains 7 pages:
 
 1. index.html (allows to upgrade firmware image, screenshot below)
 2. uboot.html (allows to upgrade U-Boot image)

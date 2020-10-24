@@ -70,23 +70,14 @@ header fields and finally send the packet back to the peer.
 /*-----------------------------------------------------------------------------------*/
 /* Variable definitions. */
 
+#define UIP_WEBIPADDR0     10
+#define UIP_WEBIPADDR1     123
+#define UIP_WEBIPADDR2     123
+#define UIP_WEBIPADDR3     1
 
-/* The IP address of this host. If it is defined to be fixed (by setting UIP_FIXEDADDR to 1 in uipopt.h), the address is set here. Otherwise, the address */
-#if UIP_FIXEDADDR > 0
-const unsigned short int uip_hostaddr[2] =
-	{HTONS((UIP_IPADDR0 << 8) | UIP_IPADDR1),
-	 HTONS((UIP_IPADDR2 << 8) | UIP_IPADDR3)};
-const unsigned short int uip_arp_draddr[2] =
-	{HTONS((UIP_DRIPADDR0 << 8) | UIP_DRIPADDR1),
-	 HTONS((UIP_DRIPADDR2 << 8) | UIP_DRIPADDR3)};
-const unsigned short int uip_arp_netmask[2] =
-	{HTONS((UIP_NETMASK0 << 8) | UIP_NETMASK1),
-	 HTONS((UIP_NETMASK2 << 8) | UIP_NETMASK3)};
-#else
-unsigned short int uip_hostaddr[2];       
+/* The IP address of this host and the special recovery web IP address */
+unsigned short int uip_hostaddr[2], uip_webaddr[2];       
 unsigned short int uip_arp_draddr[2], uip_arp_netmask[2];
-#endif /* UIP_FIXEDADDR */
-
 
 /* The packet buffer that contains incoming packets. */
 u8_t uip_buf[UIP_BUFSIZE+2];
@@ -192,9 +183,9 @@ uip_init(void) {
 	
 
 	/* IPv4 initialization. */
-#if UIP_FIXEDADDR == 0
 	uip_hostaddr[0] = uip_hostaddr[1] = 0;
-#endif /* UIP_FIXEDADDR */
+	uip_webaddr[0] = HTONS((UIP_WEBIPADDR0 << 8) | UIP_WEBIPADDR1);
+	uip_webaddr[1] = HTONS((UIP_WEBIPADDR2 << 8) | UIP_WEBIPADDR3);
 
 }
 /*-----------------------------------------------------------------------------------*/
@@ -592,7 +583,6 @@ uip_process(u8_t flag) {
 	if(BUF->vhl != 0x45)  { /* IP version and header length. */
 		UIP_STAT(++uip_stat.ip.drop);
 		UIP_STAT(++uip_stat.ip.vhlerr);
-		UIP_LOG("ip: invalid version or header length.");
 		goto drop;
 	}
 	
@@ -619,31 +609,13 @@ uip_process(u8_t flag) {
 		goto drop;
 #endif /* UIP_REASSEMBLY */
 	}
-
-	/* If we are configured to use ping IP address configuration and
-	 * hasn't been assigned an IP address yet, we accept all ICMP packets.
-	 */
-#if UIP_PINGADDRCONF
-	if((uip_hostaddr[0] | uip_hostaddr[1]) == 0) {
-		if(BUF->proto == UIP_PROTO_ICMP) {
-			UIP_LOG("ip: possible ping config packet received.");
-			goto icmp_input;
-		} else {
-			UIP_LOG("ip: packet dropped since no address assigned.");
-			goto drop;
-		}
-	}
-#endif /* UIP_PINGADDRCONF */
 	
-	/* Check if the packet is destined for our IP address. */  
-	if(BUF->destipaddr[0] != uip_hostaddr[0]) {
+	/* Check if the packet is destined for us. */  
+	if((BUF->destipaddr[0] != 0xffff || BUF->destipaddr[1] != 0xffff) &&
+	    (BUF->destipaddr[0] != uip_hostaddr[0] || BUF->destipaddr[1] != uip_hostaddr[1] || (BUF->proto != UIP_PROTO_UDP && BUF->proto != UIP_PROTO_ICMP)) &&
+	    (BUF->destipaddr[0] != uip_webaddr[0] || BUF->destipaddr[1] != uip_webaddr[1] || (BUF->proto != UIP_PROTO_TCP && BUF->proto != UIP_PROTO_ICMP))) {
 		UIP_STAT(++uip_stat.ip.drop);
-		UIP_LOG("ip: packet not for us.");        
-		goto drop;
-	}
-	if(BUF->destipaddr[1] != uip_hostaddr[1]) {
-		UIP_STAT(++uip_stat.ip.drop);
-		UIP_LOG("ip: packet not for us.");        
+		/*UIP_LOG("ip: packet not for us.");*/
 		goto drop;
 	}
 
@@ -685,16 +657,6 @@ uip_process(u8_t flag) {
 		UIP_LOG("icmp: not icmp echo.");
 		goto drop;
 	}
-
-	/* If we are configured to use ping IP address assignment, we use
-	 * the destination IP address of this ping packet and assign it to ourself.
-	 */
-#if UIP_PINGADDRCONF
-	if((uip_hostaddr[0] | uip_hostaddr[1]) == 0) {
-		uip_hostaddr[0] = BUF->destipaddr[0];
-		uip_hostaddr[1] = BUF->destipaddr[1];
-	}
-#endif /* UIP_PINGADDRCONF */  
 	
 	ICMPBUF->type = ICMP_ECHO_REPLY;
 	
@@ -725,6 +687,7 @@ uip_process(u8_t flag) {
 		 UDP/IP headers, but let the UDP application do all the hard
 		 work. If the application sets uip_slen, it has a packet to
 		 send. */
+
 #if UIP_UDP_CHECKSUMS
 	if(uip_udpchksum() != 0xffff) { 
 		UIP_STAT(++uip_stat.udp.drop);
@@ -740,10 +703,8 @@ uip_process(u8_t flag) {
 			++uip_udp_conn) {
 		if(uip_udp_conn->lport != 0 &&
 			 UDPBUF->destport == uip_udp_conn->lport &&
-			 (uip_udp_conn->rport == 0 ||
-				UDPBUF->srcport == uip_udp_conn->rport) &&
-			 BUF->srcipaddr[0] == uip_udp_conn->ripaddr[0] &&
-			 BUF->srcipaddr[1] == uip_udp_conn->ripaddr[1]) {
+			 (uip_udp_conn->rport == 0 || UDPBUF->srcport == uip_udp_conn->rport) &&
+				((BUF->destipaddr[0] == 0xffff && BUF->destipaddr[1] == 0xffff) || (BUF->srcipaddr[0] == uip_udp_conn->ripaddr[0] && BUF->srcipaddr[1] == uip_udp_conn->ripaddr[1]))) {
 			goto udp_found; 
 		}
 	}
@@ -1434,8 +1395,8 @@ uip_process(u8_t flag) {
 	BUF->srcport  = uip_connr->lport;
 	BUF->destport = uip_connr->rport;
 
-	BUF->srcipaddr[0] = uip_hostaddr[0];
-	BUF->srcipaddr[1] = uip_hostaddr[1];
+	BUF->srcipaddr[0] = uip_webaddr[0];
+	BUF->srcipaddr[1] = uip_webaddr[1];
 	BUF->destipaddr[0] = uip_connr->ripaddr[0];
 	BUF->destipaddr[1] = uip_connr->ripaddr[1];
  
@@ -1459,7 +1420,7 @@ uip_process(u8_t flag) {
 	BUF->tcpchksum = 0;
 	BUF->tcpchksum = ~(uip_tcpchksum());
 	
- //ip_send_nolen:
+ ip_send_nolen:
 
 	BUF->vhl = 0x45;
 	BUF->tos = 0;

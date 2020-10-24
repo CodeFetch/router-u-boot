@@ -106,70 +106,6 @@ typedef unsigned short uip_stats_t;
 */
 
 /**
- * Determines if uIP should use a fixed IP address or not.
- *
- * If uIP should use a fixed IP address, the settings are set in the
- * uipopt.h file. If not, the macros uip_sethostaddr(),
- * uip_setdraddr() and uip_setnetmask() should be used instead.
- *
- * \hideinitializer
- */
-#define UIP_FIXEDADDR    0
-
-/**
- * Ping IP address asignment.
- *
- * uIP uses a "ping" packets for setting its own IP address if this
- * option is set. If so, uIP will start with an empty IP address and
- * the destination IP address of the first incoming "ping" (ICMP echo)
- * packet will be used for setting the hosts IP address.
- *
- * \note This works only if UIP_FIXEDADDR is 0.
- *
- * \hideinitializer
- */
-#define UIP_PINGADDRCONF 0
-
-#define UIP_IPADDR0     192 /**< The first octet of the IP address of
-			       this uIP node, if UIP_FIXEDADDR is
-			       1. \hideinitializer */
-#define UIP_IPADDR1     168 /**< The second octet of the IP address of
-			       this uIP node, if UIP_FIXEDADDR is
-			       1. \hideinitializer */
-#define UIP_IPADDR2     0   /**< The third octet of the IP address of
-			       this uIP node, if UIP_FIXEDADDR is
-			       1. \hideinitializer */
-#define UIP_IPADDR3     250   /**< The fourth octet of the IP address of
-			       this uIP node, if UIP_FIXEDADDR is
-			       1. \hideinitializer */
-
-#define UIP_NETMASK0    255 /**< The first octet of the netmask of
-			       this uIP node, if UIP_FIXEDADDR is
-			       1. \hideinitializer */
-#define UIP_NETMASK1    255 /**< The second octet of the netmask of
-			       this uIP node, if UIP_FIXEDADDR is
-			       1. \hideinitializer */
-#define UIP_NETMASK2    255 /**< The third octet of the netmask of
-			       this uIP node, if UIP_FIXEDADDR is
-			       1. \hideinitializer */
-#define UIP_NETMASK3    0   /**< The fourth octet of the netmask of
-			       this uIP node, if UIP_FIXEDADDR is
-			       1. \hideinitializer */
-
-#define UIP_DRIPADDR0   192 /**< The first octet of the IP address of
-			       the default router, if UIP_FIXEDADDR is
-			       1. \hideinitializer */
-#define UIP_DRIPADDR1   168 /**< The second octet of the IP address of
-			       the default router, if UIP_FIXEDADDR is
-			       1. \hideinitializer */
-#define UIP_DRIPADDR2   0   /**< The third octet of the IP address of
-			       the default router, if UIP_FIXEDADDR is
-			       1. \hideinitializer */
-#define UIP_DRIPADDR3   1   /**< The fourth octet of the IP address of
-			       the default router, if UIP_FIXEDADDR is
-			       1. \hideinitializer */
-
-/**
  * Specifies if the uIP ARP module should be compiled with a fixed
  * Ethernet MAC address or not.
  *
@@ -253,7 +189,7 @@ typedef unsigned short uip_stats_t;
  *
  * \hideinitializer
  */
-#define UIP_UDP           0
+#define UIP_UDP           1
 
 /**
  * Toggles if UDP checksums should be used or not.
@@ -277,7 +213,9 @@ typedef unsigned short uip_stats_t;
  *
  * \hideinitializer
  */
-#define UIP_UDP_APPCALL  udp_appcall
+/* Defined in minihttpd.h
+ * #define UIP_UDP_APPCALL  udp_appcall
+ */
 
 /** @} */
 /*------------------------------------------------------------------------------*/
@@ -296,7 +234,7 @@ typedef unsigned short uip_stats_t;
  *
  * \hideinitializer
  */
-#define UIP_ACTIVE_OPEN 0
+#define UIP_ACTIVE_OPEN 1
 
 /**
  * The maximum number of simultaneously open TCP connections.
@@ -446,7 +384,7 @@ typedef unsigned short uip_stats_t;
  *
  * \hideinitializer
  */
-#define UIP_LOGGING     0
+#define UIP_LOGGING     1
 
 /**
  * Print out a uIP log message.
@@ -554,6 +492,7 @@ struct httpd_state {
    used. If you don't use the example web server, you should change
    this. */
 #include "httpd.h"
+#include "minidhcpd.h"
 
 
 #endif /* __UIPOPT_H__ */

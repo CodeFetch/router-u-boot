@@ -155,7 +155,7 @@ uip_arp_timer(void)
 
 }
 /*-----------------------------------------------------------------------------------*/
-static void
+void
 uip_arp_update(u16_t *ipaddr, struct uip_eth_addr *ethaddr)
 {
   register struct arp_entry *tabptr = 0;

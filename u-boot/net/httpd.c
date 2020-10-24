@@ -41,6 +41,7 @@ void HttpdHandler(void){
 // start http daemon
 void HttpdStart(void){
 	uip_init();
+	minidhcpd_init();
 	httpd_init();
 }
 
